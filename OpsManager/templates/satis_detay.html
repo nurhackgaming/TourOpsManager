@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+    <style>
+        @media print {
+            
+            .left-sidenav, .btn, .topbar, .page-title-box{
+                display: none !important;
+            }
+        }
+    </style>
+    
+{% endblock css %}
+    
+{% block content %}
+<div class="container">
+    <h1>{{ title }}</h1>
+    <a class="btn btn-success mb-2" href="{% url 'edit_satis' satis_id=satis.id %}">Düzenle</a>
+    <a class="btn btn-info mb-2" href="{% url 'satis_raporu_indir' satis_id=satis.id %}" class="btn btn-primary">Satış Raporunu İndir</a>
+
+
+    <table class="table table-striped mt-5">
+        <thead class="my-5">
+            <tr>
+                <th>Toplam Yolcu Sayısı</th>
+                <th>Yolcu Ad-Soyad</th>
+                <th>Yolcu Tel</th>
+                <th>Yolcu Pasaport</th>
+                <!-- Diğer sütunlar burada eklenebilir -->
+            </tr>
+        </thead>
+        <tbody class="my-5">
+            {% if satis.yolcu %}
+                <tr>
+                    <td>{{ yolcu_sayisi }} Yolcu</td>
+                    <td>{{ satis.yolcu.musteri.ad }} {{ satis.yolcu.musteri.soyad }}</td>
+                    <td>{{ satis.yolcu.musteri.tel }}</td>
+                    <td>{{ satis.yolcu.pasaport }}</td>
+                </tr>
+            {% endif %}
+            {% if satis.digeryolcular.all %}
+                {% for yolcu in satis.digeryolcular.all %}
+                  <tr>
+                    <td></td>
+                    <td>{{ yolcu.ad }} {{ yolcu.soyad }}</td>
+                    <td>{{ yolcu.tel }}</td>
+                    <td>{{ yolcu.pasaport }}</td>
+                  </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+    <hr class="my-5">
+    <table class="table table-striped mt-5">
+        <thead>
+            <tr>
+                <th>Sipariş No</th>
+                <th>Satıcı Personel</th>
+                <th>Alıcı Müşteri</th>
+                <th>Başlangıç Tarihi</th>
+                <th>Bitiş Tarihi</th>
+                <th>Satış Durumu</th>
+                <th>Toplam Fiyat</th>
+                <!-- Diğer sütunlar burada eklenebilir -->
+            </tr>
+        </thead>
+        
+        <tbody>
+                <tr>
+                    <td>{{ satis.id }}</td>
+                    <td>{{ satis.satici_personel.user.get_full_name }}</td>
+                    <td>{{ satis.alici_musteri.ad }} {{ satis.alici_musteri.soyad }}</td>
+                    <td>{{ satis.baslangic_tarihi }}</td>
+                    <td>{{ satis.bitis_tarihi }}</td>
+                    <td>{% if satis.satildi %}Satıldı{% else %}Beklemede{% endif %}</td>
+                    <td>$ {{ satis.total_price }}</td>
+                    <!-- Diğer sütunlar burada eklenebilir -->
+                </tr>
+                <!-- Satis itemlerini içeren bir alt tablo oluşturun -->
+                <tr>
+                    <td colspan="7">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Gün</th>
+                                    <th>Saat</th>
+                                    <th>İşlem Türü</th>
+                                    <th>Açıklama</th>
+                                    <th>Otel</th>
+                                    <th>Otel Türü</th>
+                                    <th>Tur</th>
+                                    <th>Transfer</th>
+                                    <th>Araç Tipi</th>
+                                    <th>Rehber</th>
+                                    <th>Fiyat</th>
+                                    <!-- Diğer sütunlar burada eklenebilir -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for satis_item in satis.satisitem_set.all %}
+                                    <tr>
+                                        {% if satis_item.gun != None %}
+                                            <td>{{ satis_item.gun }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        {% if satis_item.saat != None %}
+                                            <td>{{ satis_item.saat }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        {% if satis_item.islem_turu != None %}
+                                            <td>{{ satis_item.islem_turu }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        {% if satis_item.aciklama != None %}
+                                            <td>{{ satis_item.aciklama }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        {% if satis_item.oteller != None %}
+                                            <td>{{ satis_item.oteller }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        {% if satis_item.otel_turu != None %}
+                                            <td>{{ satis_item.otel_turu }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        {% if satis_item.turlar != None %}
+                                            <td>{{ satis_item.turlar }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        {% if satis_item.transferler != None %}
+                                            <td>{{ satis_item.transferler }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        {% if satis_item.arac_tipi != None %}
+                                            <td>{{ satis_item.arac_tipi }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        {% if satis_item.rehber != None %}
+                                            <td>{{ satis_item.rehber }}</td>
+                                        {% else %}
+                                            <td>----</td>
+                                        {% endif %}
+                                        <td>$ {{ satis_item.fiyat }}</td>
+                                        
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            {% if not satis %}
+                <tr>
+                    <td colspan="6">Herhangi bir satış bulunmamaktadır.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
+
+{% block js %}
+    <!-- jQuery  -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/waves.js' %}"></script>
+    <script src="{% static 'assets/js/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/simplebar.min.js' %}"></script>
+
+{% endblock js %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock css %}
+    
+{% block content %}
+
+<!-- Add Vehicle page -->
+<div class="container">
+    <div class="row  d-flex justify-content-center">
+        <div class="col-12 align-self-center">
+            <div class="row">
+                <div class="col-lg-5 mx-auto">
+                    <div class="card">
+                        <div class="card-body p-0 auth-header-box">
+                            <div class="text-center p-1">   
+                                <h4 class="text-muted  mb-0">Carga Business</h4>  
+                                <p class="text-muted  mb-0">{{ title }}</p>  
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="tab-pane active p-3 pt-3" id="LogIn_Tab" role="tabpanel">                                        
+                                    <div class="container">
+                                        <!-- ... -->
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            {{ form.as_p }}
+                                            <button class="btn btn-primary" type="submit">Araç Ekle</button>
+                                        </form>
+                                        <!-- ... -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--end card-body-->
+                        <div class="card-body bg-light-alt text-center">
+                            <span class="text-muted d-none d-sm-inline-block">Carga Business © 2023</span>                                            
+                        </div>
+                    </div><!--end card-->
+                </div><!--end col-->
+            </div><!--end row-->
+        </div><!--end col-->
+    </div><!--end row-->
+</div><!--end container-->
+<!-- End Add Vehicle page -->
+
+{% endblock content %}
+
+{% block js %}
+    <!-- jQuery  -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/waves.js' %}"></script>
+    <script src="{% static 'assets/js/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/simplebar.min.js' %}"></script>
+{% endblock js %}

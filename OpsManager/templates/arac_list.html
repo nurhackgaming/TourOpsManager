@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock css %}
+    
+{% block content %}
+<div class="container mt-4">
+    <h4 class="mb-3">{{ title }}</h4>
+    <a class="btn btn-success mb-2" href="{% url 'add_arac' %}">Ekle</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Araç</th>
+                <th scope="col">Kapasite</th>
+                <th scope="col">İşlemler</th>
+                <!-- Diğer personel alanları eklenebilir -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for arac in araclar %}
+                <tr>
+                    <td>{{ arac.adi }}</td>
+                    <td>{{ arac.kapasite }}</td>
+                    <td>
+                        <a class="btn btn-danger ml-2" href="#" data-toggle="modal" data-target="#silModal{{ arac.id }}">Sil</a>
+                        
+                        <!-- Onaylama modalı -->
+                        <div class="modal fade" id="silModal{{ arac.id }}" tabindex="-1" role="dialog" aria-labelledby="silModalLabel{{ arac.id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="silModalLabel{{ arac.id }}">Aracı Sil</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {{ arac.adi }} adlı aracı silmek istediğinize emin misiniz?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                                        <form action="{% url 'delete_arac' arac.id %}" method="POST">
+                                            {% csrf_token %}
+                                            <button class="btn btn-danger" type="submit">Sil</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Diğer personel alanları burada görüntülenebilir -->
+                    </td>
+                    <!-- Diğer personel alanları burada görüntülenebilir -->
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">Herhangi bir departman bulunmamaktadır.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+    <!-- jQuery  -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/waves.js' %}"></script>
+    <script src="{% static 'assets/js/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/simplebar.min.js' %}"></script>
+{% endblock js %}

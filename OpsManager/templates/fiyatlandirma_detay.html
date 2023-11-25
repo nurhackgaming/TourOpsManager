@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+    <style>
+        @media print {
+            
+            .left-sidenav, .btn, .topbar, .page-title-box{
+                display: none !important;
+            }
+        }
+    </style>
+    
+{% endblock css %}
+    
+{% block content %}
+<div class="container">
+    <h1>{{ title }}</h1>
+    <table class="table table-striped mt-5">
+        <thead class="my-5">
+            <tr>
+                <th>Oluşturan</th>
+                <th>Genel Toplam</th>
+                <th>Araç Toplam</th>
+                <th>Transfer Toplam</th>
+                <th>Rehber Toplam</th>
+                <th>Yemek Toplam</th>
+                <th>Double Otel Toplam</th>
+                <th>Single Otel Toplam</th>
+                <!-- Diğer sütunlar burada eklenebilir -->
+            </tr>
+        </thead>
+        <tbody class="my-5">
+            <tr>
+                <td>{{fiyatlandirma.olusturan.user.get_full_name}}</td>
+                <td>$ {{ fiyatlandirma.genel_toplam }}</td>
+                <td>$ {{ fiyatlandirma.arac_toplam }}</td>
+                <td>$ {{ fiyatlandirma.transfer_toplam }}</td>
+                <td>$ {{ fiyatlandirma.rehber_toplam }}</td>
+                <td>$ {{ fiyatlandirma.yemek_toplam }}</td>
+                <td>$ {{ fiyatlandirma.double_oda_toplam }}</td>
+                <td>$ {{ fiyatlandirma.single_oda_toplam }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr class="my-5">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tarih</th>
+                <th>Açıklama</th>
+                <th>Araç Fiyatı</th>
+                <th>Transfer Fiyatı</th>
+                <th>Rehber Fiyatı</th>
+                <th>Yemek Fiyatı</th>
+                <th>Double Otel Fiyatı</th>
+                <th>Single Otel Fiyatı</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fiyatlandirma_item in fiyatlandirma.fiyatlandirmaitem_set.all %}
+                
+                {% if fiyatlandirma_item.aciklama or fiyatlandirma_item.arac_fiyati or fiyatlandirma_item.transfer_fiyati or fiyatlandirma_item.rehber_fiyati or fiyatlandirma_item.yemek_fiyati or fiyatlandirma_item.double_oda_fiyati or fiyatlandirma_item.single_oda_fiyati%}
+                    <tr>
+                        {% if fiyatlandirma_item.tarih != None %}
+                            <td>{{ fiyatlandirma_item.tarih }}</td>
+                        {% else %}
+                            <td>----</td>
+                        {% endif %}
+                        {% if fiyatlandirma_item.aciklama != None %}
+                            <td>{{ fiyatlandirma_item.aciklama }}</td>
+                        {% else %}
+                            <td>----</td>
+                        {% endif %}
+                        {% if fiyatlandirma_item.arac_fiyati != None %}
+                            <td>$ {{ fiyatlandirma_item.arac_fiyati }}</td>
+                        {% else %}
+                            <td>----</td>
+                        {% endif %}
+                        {% if fiyatlandirma_item.transfer_fiyati != None %}
+                            <td>$ {{ fiyatlandirma_item.transfer_fiyati }}</td>
+                        {% else %}
+                            <td>----</td>
+                        {% endif %}
+                        {% if fiyatlandirma_item.rehber_fiyati != None %}
+                            <td>$ {{ fiyatlandirma_item.rehber_fiyati }}</td>
+                        {% else %}
+                            <td>----</td>
+                        {% endif %}
+                        {% if fiyatlandirma_item.yemek_fiyati != None %}
+                            <td>$ {{ fiyatlandirma_item.yemek_fiyati }}</td>
+                        {% else %}
+                            <td>----</td>
+                        {% endif %}
+                        {% if fiyatlandirma_item.double_oda_fiyati != None %}
+                            <td>$ {{ fiyatlandirma_item.double_oda_fiyati }}</td>
+                        {% else %}
+                            <td>----</td>
+                        {% endif %}
+                        {% if fiyatlandirma_item.single_oda_fiyati != None %}
+                            <td>$ {{ fiyatlandirma_item.single_oda_fiyati }}</td>
+                        {% else %}
+                            <td>----</td>
+                        {% endif %}
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
+
+{% block js %}
+    <!-- jQuery  -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/waves.js' %}"></script>
+    <script src="{% static 'assets/js/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/simplebar.min.js' %}"></script>
+
+{% endblock js %}

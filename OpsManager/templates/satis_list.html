@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock css %}
+    
+{% block content %}
+<div class="container">
+    <h1>{{ title }}</h1>
+    <a class="btn btn-success mb-2" href="{% url 'add_satis' %}">Ekle</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Satıcı Personel</th>
+                <th>Alıcı Müşteri</th>
+                <th>Başlangıç Tarihi</th>
+                <th>Bitiş Tarihi</th>
+                <th>Toplam Fiyat</th>
+                <th>Satış?</th>
+                <!-- Diğer sütunlar burada eklenebilir -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for satis in satislar %}
+                <tr>
+                    <td><a href="{% url 'satis_detay' satis.id %}">{{ satis.id }}</a></td>
+                    <td>{{ satis.satici_personel.user.get_full_name }}</td>
+                    <td>{{ satis.alici_musteri.ad }} {{ satis.alici_musteri.soyad }}</td>
+                    <td>{{ satis.baslangic_tarihi }}</td>
+                    <td>{{ satis.bitis_tarihi }}</td>
+                    <td>{{ satis.total_price }}</td>
+                    <td>{% if satis.satildi %}Satıldı {%else%}Beklemede {%endif%}</td>
+                    <!-- Diğer sütunlar burada eklenebilir -->
+                </tr>
+                
+            {% empty %}
+                <tr>
+                    <td colspan="6">Herhangi bir satış bulunmamaktadır.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
+
+{% block js %}
+    <!-- jQuery  -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/waves.js' %}"></script>
+    <script src="{% static 'assets/js/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/simplebar.min.js' %}"></script>
+{% endblock js %}

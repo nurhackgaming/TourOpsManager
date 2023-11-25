@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock css %}
+    
+{% block content %}
+<div class="container">
+    <h1>{{ title }}</h1>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Personel</th>
+                <th>Genel Toplam</th>
+                <th>Araç Fiyatı Toplam</th>
+                <th>Transfer Fiyatı Toplam</th>
+                <th>Rehber Fiyatı Toplam</th>
+                <th>Yemek Fiyatı Toplam</th>
+                <th>Double Otel Fiyatı Toplam</th>
+                <th>Single Otel Fiyatı Toplam</th>
+                <!-- Diğer sütunlar burada eklenebilir -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for fiyatlandirma in fiyatlandirmalar %}
+                <tr>
+                    
+                    <td><a href="{% url 'fiyatlandirma_detay' fiyatlandirma.id %}">{{ fiyatlandirma.id }}</a></td>
+                    <td>{{ fiyatlandirma.olusturan.user.get_full_name }}</td>
+                    <td>$ {{ fiyatlandirma.genel_toplam }}</td>
+                    <td>$ {{ fiyatlandirma.arac_toplam }}</td>
+                    <td>$ {{ fiyatlandirma.transfer_toplam }}</td>
+                    <td>$ {{ fiyatlandirma.rehber_toplam }}</td>
+                    <td>$ {{ fiyatlandirma.yemek_toplam }}</td>
+                    <td>$ {{ fiyatlandirma.double_oda_toplam }}</td>
+                    <td>$ {{ fiyatlandirma.single_oda_toplam }}</td>
+                    <!-- Diğer sütunlar burada eklenebilir -->
+                </tr>
+                
+            {% empty %}
+                <tr>
+                    <td colspan="6">Herhangi bir satış bulunmamaktadır.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
+
+{% block js %}
+    <!-- jQuery  -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/waves.js' %}"></script>
+    <script src="{% static 'assets/js/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/simplebar.min.js' %}"></script>
+{% endblock js %}

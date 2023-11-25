@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <title>{{ title }} | Carga Business</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+        <meta content="" name="author" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="{% static 'assets/images/favicon.ico' %}">
+
+        <!-- App css -->
+        <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'assets/css/jquery-ui.min.css' %}" rel="stylesheet">
+        <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'assets/css/metisMenu.min.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'plugins/daterangepicker/daterangepicker.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+        
+        {% block css %}
+            
+        {% endblock css %}
+            
+    </head>
+
+    <body class="dark-sidenav">
+        
+        <!-- Left Sidenav -->
+        <div class="left-sidenav">
+            <!-- LOGO -->
+            <div class="brand">
+                <a href="{% url 'index' %}" class="logo">
+                    <span>
+                        <img src="{% static 'assets/images/logo-sm.png' %}" alt="logo-small" class="logo-sm">
+                    </span>
+                    <span class="text-white">
+                        Carga Business
+                    </span>
+                </a>
+            </div>
+            <!--end logo-->
+            <div class="menu-content h-100" data-simplebar>
+                <ul class="metismenu left-sidenav-menu">
+                    <li class="menu-label mt-0">Menü</li>
+                    <li>
+                        <a href="{% url 'index' %}"><i data-feather="layers" class="align-self-center menu-icon"></i><span>Anasayfa</span></a>
+                    </li>
+                    <li>
+                        <a href="{% url 'create_fiyatlandirma' %}"><i data-feather="layers" class="align-self-center menu-icon"></i><span>Fiyatlandırma</span></a>
+                    </li>
+                    <li>
+                        <a href="{% url 'fiyatlandırma_list' %}"><i data-feather="layers" class="align-self-center menu-icon"></i><span>Fiyatlandırma Listesi</span></a>
+                    </li>
+                    
+                    {% if request.user.personel.is_ceo %}
+                        <hr>
+                        <li class="menu-label mt-2">Şirket Yönetimi</li>  
+                                  
+                        <li>
+                            <a href="{% url 'departman_list' %}"><i data-feather="user" class="align-self-center menu-icon"></i><span>Departmanlar</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'personel_list' %}"><i data-feather="user" class="align-self-center menu-icon"></i><span>Personeller</span></a>
+                        </li>
+                    {% else %} 
+                        <hr>
+                        <li class="menu-label mt-2">Operasyon Yönetimi</li>
+                        <li>
+                            <a href="{% url 'musteri_list' %}"><i data-feather="user" class="align-self-center menu-icon"></i><span>Müşteriler</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'satis_list' %}"><i data-feather="user" class="align-self-center menu-icon"></i><span>Satışlar</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'yolcu_bilgileri_list' %}"><i data-feather="user" class="align-self-center menu-icon"></i><span>Yolcu Bilgileri</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'diger_yolcu_bilgileri_list' %}"><i data-feather="user" class="align-self-center menu-icon"></i><span>Diğer Yolcu Bilgileri</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'arac_list' %}"><i data-feather="truck" class="align-self-center menu-icon"></i><span>Araçlar</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'il_list' %}"><i data-feather="map-pin" class="align-self-center menu-icon"></i><span>İller</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'lokasyon_list' %}"><i data-feather="map-pin" class="align-self-center menu-icon"></i><span>Lokasyonlar</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'sabit_gider_list' %}"><i data-feather="dollar-sign" class="align-self-center menu-icon"></i><span>Sabit Giderler</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'otel_list' %}"><i data-feather="home" class="align-self-center menu-icon"></i><span>Oteller</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'rehber_list' %}"><i data-feather="map" class="align-self-center menu-icon"></i><span>Rehberler</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'tur_list' %}"><i data-feather="navigation-2" class="align-self-center menu-icon"></i><span>Turlar</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'transfer_list' %}"><i data-feather="navigation" class="align-self-center menu-icon"></i><span>Transferler</span></a>
+                        </li>
+                        
+                        
+                    {% endif %}   
+                </ul>
+    
+            </div>
+        </div>
+        <!-- end left-sidenav-->
+        
+
+        <div class="page-wrapper">
+            <!-- Top Bar Start -->
+            <div class="topbar">            
+                <!-- Navbar -->
+                <nav class="navbar-custom">    
+                    <ul class="list-unstyled topbar-nav float-right mb-0">  
+                        <li class="dropdown">
+                            <a class="nav-link dropdown-toggle waves-effect waves-light nav-user" data-toggle="dropdown" href="#" role="button"
+                                aria-haspopup="false" aria-expanded="false">
+                                <!-- Display the logged in user's username -->
+                                <span class="ml-1 nav-user-name hidden-sm">{{ user.first_name }} {{ user.last_name }}</span>
+                                <!-- Display the user's profile picture or a default one if not available -->
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <!-- Link to trigger the logout process -->
+                                <a class="dropdown-item" href="{% url 'logout' %}"><i data-feather="power" class="align-self-center icon-xs icon-dual mr-1"></i> Logout</a>
+                            </div>
+                        </li>
+                        
+                    </ul><!--end topbar-nav-->
+        
+                    <ul class="list-unstyled topbar-nav mb-0">                        
+                        <li>
+                            <button class="nav-link button-menu-mobile">
+                                <i data-feather="menu" class="align-self-center topbar-icon"></i>
+                            </button>
+                        </li>                            
+                    </ul>
+                </nav>
+                <!-- end navbar-->
+            </div>
+            <!-- Top Bar End -->
+
+            <!-- Page Content-->
+            <div class="page-content">
+                <div class="container-fluid">
+                    <!-- Page-Title -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="page-title-box">
+                                <div class="row">
+                                    <div class="col">
+                                        <h4 class="page-title">{{ title }}</h4>
+                                        <ol class="breadcrumb">
+                                            <li class="breadcrumb-item"><a href="{% url 'index' %}">Dashboard</a></li>
+                                            <li class="breadcrumb-item active">{{ title }}</li>
+                                        </ol>
+                                    </div><!--end col-->
+                                    
+                                </div><!--end row-->                                                              
+                            </div><!--end page-title-box-->
+                        </div><!--end col-->
+                    </div><!--end row-->
+                    <!-- end page title end breadcrumb -->
+                    {% if messages %}
+                        <div class="container mt-3">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% block content %}{% endblock content %}
+                        
+
+                </div><!-- container -->
+
+                
+            </div>
+            <!-- end page content -->
+        </div>
+        <!-- end page-wrapper -->
+
+        
+
+
+        <!-- jQuery  -->
+        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/metismenu.min.js' %}"></script>
+        <script src="{% static 'assets/js/waves.js' %}"></script>
+        <script src="{% static 'assets/js/feather.min.js' %}"></script>
+        <script src="{% static 'assets/js/simplebar.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery-ui.min.js' %}"></script>
+        <script src="{% static 'assets/js/moment.js' %}"></script>
+        <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+        <script src="{% static 'plugins/apex-charts/apexcharts.min.js' %}"></script>
+        <script src="{% static 'plugins/flot-chart/jquery.canvaswrapper.js' %}"></script>
+        <script src="{% static 'plugins/flot-chart/jquery.colorhelpers.js' %}"></script>
+        <script src="{% static 'plugins/flot-chart/jquery.flot.js' %}"></script>        
+        <script src="{% static 'plugins/flot-chart/jquery.flot.saturated.js' %}"></script>
+        <script src="{% static 'plugins/flot-chart/jquery.flot.browser.js' %}"></script>
+        <script src="{% static 'plugins/flot-chart/jquery.flot.drawSeries.js' %}"></script>         
+        <script src="{% static 'plugins/flot-chart/jquery.flot.uiConstants.js' %}"></script>
+        <script src="{% static 'plugins/flot-chart/jquery.flot-dataType.js' %}"></script>
+        <script src="{% static 'assets/pages/jquery.crm_dashboard.init.js' %}"></script>
+
+        <!-- App js -->
+        <script src="{% static 'assets/js/app.js' %}"></script>
+        {% block js %}{% endblock js %}
+    </body>
+
+</html>

@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock css %}
+    
+{% block content %}
+
+<div class="">
+    <div class="row d-flex justify-content-center">
+        <div class="col-12 align-self-center">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center p-1">   
+                        <h4 class="text-muted mb-0">Carga Business</h4>  
+                        <p class="text-muted mb-5">{{ title }}</p>  
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div>{{ form.genel_toplam.label }}</div>
+                                <div>{{ form.genel_toplam }}</div>
+                            </div>
+                            <div class="col">
+                                <div>{{ form.arac_toplam.label }}</div>
+                                <div>{{ form.arac_toplam }}</div>
+                            </div>
+                            <div class="col">
+                                <div>{{ form.transfer_toplam.label }}</div>
+                                <div>{{ form.transfer_toplam }}</div>
+                            </div>
+                            <div class="col">
+                                <div>{{ form.rehber_toplam.label }}</div>
+                                <div>{{ form.rehber_toplam }}</div>
+                            </div>
+                            <div class="col">
+                                <div>{{ form.yemek_toplam.label }}</div>
+                                <div>{{ form.yemek_toplam }}</div>
+                            </div>
+                            <div class="col">
+                                <div>{{ form.double_oda_toplam.label }}</div>
+                                <div>{{ form.double_oda_toplam }}</div>
+                            </div>
+                            <div class="col">
+                                <div>{{ form.single_oda_toplam.label }}</div>
+                                <div>{{ form.single_oda_toplam   }}</div>
+                            </div>
+                        </div>
+                        {{ formset.management_form }}
+                        {% for form in formset %}
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <div>{{ form.tarih.label }}</div>
+                                    <div>{{ form.tarih }}</div>
+                                </div>
+                                <div class="col-2">
+                                    <div>{{ form.aciklama.label }}</div>
+                                    <div>{{ form.aciklama }}</div>
+                                </div>
+                                <div class="col">
+                                    <div>{{ form.arac_fiyati.label }}</div>
+                                    <div>{{ form.arac_fiyati }}</div>
+                                </div>
+                                <div class="col">
+                                    <div>{{ form.transfer_fiyati.label }}</div>
+                                    <div>{{ form.transfer_fiyati }}</div>
+                                </div>
+                                <div class="col">
+                                    <div>{{ form.rehber_fiyati.label }}</div>
+                                    <div>{{ form.rehber_fiyati }}</div>
+                                </div>
+                                <div class="col">
+                                    <div>{{ form.yemek_fiyati.label }}</div>
+                                    <div>{{ form.yemek_fiyati }}</div>
+                                </div>
+                                <div class="col">
+                                    <div>{{ form.double_oda_fiyati.label }}</div>
+                                    <div>{{ form.double_oda_fiyati }}</div>
+                                </div>
+                                <div class="col">
+                                    <div>{{ form.single_oda_fiyati.label }}</div>
+                                    <div>{{ form.single_oda_fiyati }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <button class="btn btn-primary" type="submit">Fiyatlandır</button>
+                    </form>
+                </div>
+                <div class="card-body bg-light-alt text-center">
+                    <span class="text-muted d-none d-sm-inline-block">Carga Business © 2023</span>                                            
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/waves.js' %}"></script>
+    <script src="{% static 'assets/js/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/simplebar.min.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // İlk tarih inputunu seç
+            var initialDateInput = document.getElementById('id_fiyatlandirmaitem_set-0-tarih');
+    
+            // İlk tarih inputuna bir event listener ekle
+            initialDateInput.addEventListener('change', function() {
+                // İlk tarih değerini al ve tarihe çevir
+                var initialDate = parseDate(this.value);
+    
+                // Diğer tarih inputlarını güncelle
+                for (var i = 1; i < 15; i++) {
+                    var nextDateInput = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-tarih');
+                    if (nextDateInput) {
+                        var nextDate = new Date(initialDate);
+                        nextDate.setDate(nextDate.getDate() + i); // Tarihi arttır
+                        nextDateInput.value = formatDate(nextDate); // Yeni tarihi formatla ve yerleştir
+                    }
+                }
+            });
+    
+            // Tarih string'ini Date objesine çevir
+            function parseDate(str) {
+                var parts = str.split('.');
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+    
+            // Date objesini gg.aa.yyyy formatına çevir
+            function formatDate(date) {
+                var day = ('0' + date.getDate()).slice(-2);
+                var month = ('0' + (date.getMonth() + 1)).slice(-2);
+                var year = date.getFullYear();
+                return day + '.' + month + '.' + year;
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tüm araç fiyatı inputlarını bul ve her birinin değerini topla
+            function updateTotal() {
+                var total = 0;
+                for (var i = 0; i < 15; i++) {
+                    var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-arac_fiyati');
+                    if (input && input.value) {
+                        total += parseFloat(input.value) || 0;
+                    }
+                }
+                // Toplamı id_arac_toplam inputuna yerleştir
+                var totalInput = document.getElementById('id_arac_toplam');
+                if (totalInput) {
+                    totalInput.value = total.toFixed(2); // 2 ondalık basamakla formatla
+                }
+            }
+    
+            // Her bir araç fiyatı inputuna bir event listener ekle
+            for (var i = 0; i < 15; i++) {
+                var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-arac_fiyati');
+                if (input) {
+                    input.addEventListener('change', updateTotal);
+                }
+            }
+    
+            // İlk yüklemede toplamı hesapla
+            updateTotal();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tüm transfer fiyatı inputlarını bul ve her birinin değerini topla
+            function updateTransferTotal() {
+                var total = 0;
+                for (var i = 0; i < 15; i++) {
+                    var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-transfer_fiyati');
+                    if (input && input.value) {
+                        total += parseFloat(input.value) || 0;
+                    }
+                }
+                // Toplamı id_transfer_toplam inputuna yerleştir
+                var totalInput = document.getElementById('id_transfer_toplam');
+                if (totalInput) {
+                    totalInput.value = total.toFixed(2); // 2 ondalık basamakla formatla
+                }
+            }
+    
+            // Her bir transfer fiyatı inputuna bir event listener ekle
+            for (var i = 0; i < 15; i++) {
+                var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-transfer_fiyati');
+                if (input) {
+                    input.addEventListener('change', updateTransferTotal);
+                }
+            }
+    
+            // İlk yüklemede toplamı hesapla
+            updateTransferTotal();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tüm rehber fiyatı inputlarını bul ve her birinin değerini topla
+            function updateGuideTotal() {
+                var total = 0;
+                for (var i = 0; i < 15; i++) {
+                    var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-rehber_fiyati');
+                    if (input && input.value) {
+                        total += parseFloat(input.value) || 0;
+                    }
+                }
+                // Toplamı id_rehber_toplam inputuna yerleştir
+                var totalInput = document.getElementById('id_rehber_toplam');
+                if (totalInput) {
+                    totalInput.value = total.toFixed(2); // 2 ondalık basamakla formatla
+                }
+            }
+    
+            // Her bir rehber fiyatı inputuna bir event listener ekle
+            for (var i = 0; i < 15; i++) {
+                var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-rehber_fiyati');
+                if (input) {
+                    input.addEventListener('change', updateGuideTotal);
+                }
+            }
+    
+            // İlk yüklemede toplamı hesapla
+            updateGuideTotal();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tüm yemek fiyatı inputlarını bul ve her birinin değerini topla
+            function updateMealTotal() {
+                var total = 0;
+                for (var i = 0; i < 15; i++) {
+                    var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-yemek_fiyati');
+                    if (input && input.value) {
+                        total += parseFloat(input.value) || 0;
+                    }
+                }
+                // Toplamı id_yemek_toplam inputuna yerleştir
+                var totalInput = document.getElementById('id_yemek_toplam');
+                if (totalInput) {
+                    totalInput.value = total.toFixed(2); // 2 ondalık basamakla formatla
+                }
+            }
+    
+            // Her bir yemek fiyatı inputuna bir event listener ekle
+            for (var i = 0; i < 15; i++) {
+                var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-yemek_fiyati');
+                if (input) {
+                    input.addEventListener('change', updateMealTotal);
+                }
+            }
+    
+            // İlk yüklemede toplamı hesapla
+            updateMealTotal();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tüm double oda fiyatı inputlarını bul ve her birinin değerini topla
+            function updateDoubleRoomTotal() {
+                var total = 0;
+                for (var i = 0; i < 15; i++) {
+                    var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-double_oda_fiyati');
+                    if (input && input.value) {
+                        total += parseFloat(input.value) || 0;
+                    }
+                }
+                // Toplamı id_double_oda_toplam inputuna yerleştir
+                var totalInput = document.getElementById('id_double_oda_toplam');
+                
+                if (totalInput) {
+                    totalInput.value = total.toFixed(2); // 2 ondalık basamakla formatla
+                }
+            }
+    
+            // Her bir double oda fiyatı inputuna bir event listener ekle
+            for (var i = 0; i < 15; i++) {
+                var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-double_oda_fiyati');
+                if (input) {
+                    input.addEventListener('change', updateDoubleRoomTotal);
+                }
+            }
+    
+            // İlk yüklemede toplamı hesapla
+            updateDoubleRoomTotal();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tüm single oda fiyatı inputlarını bul ve her birinin değerini topla
+            function updateSingleRoomTotal() {
+                var total = 0;
+                for (var i = 0; i < 15; i++) {
+                    var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-single_oda_fiyati');
+                    if (input && input.value) {
+                        total += parseFloat(input.value) || 0;
+                    }
+                }
+                // Toplamı id_single_oda_toplam inputuna yerleştir
+                var totalInput = document.getElementById('id_single_oda_toplam');
+                if (totalInput) {
+                    totalInput.value = total.toFixed(2); // 2 ondalık basamakla formatla
+                }
+            }
+    
+            // Her bir single oda fiyatı inputuna bir event listener ekle
+            for (var i = 0; i < 15; i++) {
+                var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-single_oda_fiyati');
+                if (input) {
+                    input.addEventListener('change', updateSingleRoomTotal);
+                }
+            }
+    
+            // İlk yüklemede toplamı hesapla
+            updateSingleRoomTotal();
+        });
+    </script>
+    <script>
+        // Tüm toplamları güncelleyen fonksiyon
+        function updateTotal() {
+            var total = 0;
+    
+            // Arac, transfer, rehber, yemek, double oda, single oda toplamlarını hesapla
+            var fields = ['arac_fiyati', 'transfer_fiyati', 'rehber_fiyati', 'yemek_fiyati', 'double_oda_fiyati', 'single_oda_fiyati'];
+            fields.forEach(function (field) {
+                for (var i = 0; i < 15; i++) {
+                    var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-' + field);
+                    if (input && input.value) {
+                        total += parseFloat(input.value) || 0;
+                    }
+                }
+            });
+    
+            // Genel toplamı güncelle
+            var totalInput = document.getElementById('id_genel_toplam');
+            if (totalInput) {
+                totalInput.value = total.toFixed(2); // 2 ondalık basamakla formatla
+            }
+        }
+    
+        // Her bir alan için event listener ekle
+        var fields = ['arac_fiyati', 'transfer_fiyati', 'rehber_fiyati', 'yemek_fiyati', 'double_oda_fiyati', 'single_oda_fiyati'];
+        fields.forEach(function (field) {
+            for (var i = 0; i < 15; i++) {
+                var input = document.getElementById('id_fiyatlandirmaitem_set-' + i + '-' + field);
+                if (input) {
+                    input.addEventListener('change', function () {
+                        updateTotal();
+                    });
+                }
+            }
+        });
+    
+        // İlk yüklemede genel toplamı hesapla
+        updateTotal();
+    </script>
+    
+    
+      
+{% endblock js %}

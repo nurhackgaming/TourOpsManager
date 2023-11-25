@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+    <style>
+        #id_sabit_giderler{
+            height: 70px;
+            display: flex; /* Flexbox kullanarak yan yana düzenleme */
+            flex-wrap: wrap; /* Eğer çok fazla seçenek varsa, yeni satıra geçmesini sağlar */
+            gap: 10px; /* Kutucuklar arasında boşluk */
+            flex: 1; /* Her label'ı esnek yapar */
+            white-space: nowrap; /* Metni tek satırda tutar */
+        }
+    </style>
+{% endblock css %}
+    
+{% block content %}
+
+<!-- Add Vehicle page -->
+<div class="container">
+    <div class="row  d-flex justify-content-center">
+        <div class="col-12 align-self-center">
+            <div class="row">
+                <div class="col-lg-12 mx-auto">
+                    <div class="card">
+                        <div class="card-body p-0 auth-header-box">
+                            <div class="text-center p-1">   
+                                <h4 class="text-muted  mb-0">Carga Business</h4>  
+                                <p class="text-muted  mb-0">{{ title }}</p>  
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="tab-pane active p-1 pt-1" id="LogIn_Tab" role="tabpanel">                                        
+                                    <div class="container">
+                                        <!-- ... -->
+                                        <form method="post" id="satisForm">
+                                            {% csrf_token %}
+                                            <div class="row mb-2">
+                                                {{form.id}}
+                                                <div class="col-md-2">
+                                                    <div>{{ form.satici_personel.label }}</div>
+                                                    <div>{{ form.satici_personel }}</div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div>{{ form.alici_musteri.label }}</div>
+                                                    <div>{{ form.alici_musteri }}</div>
+                                                </div>
+                                                
+                                                <div class="col-md-2">
+                                                    <div>{{ form.yolcu.label }}</div>
+                                                    <div>{{ form.yolcu }}</div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div>{{ form.digeryolcular.label }}</div>
+                                                    <div>{{ form.digeryolcular }}</div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div>{{ form.baslangic_tarihi.label }}</div>
+                                                    <div>{{ form.baslangic_tarihi }}</div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div>{{ form.bitis_tarihi.label }}</div>
+                                                    <div>{{ form.bitis_tarihi }}</div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div>{{ form.sabit_giderler.label }}</div>
+                                                    <div>{{ form.sabit_giderler }}</div>
+                                                </div>
+                                            </div>
+                                            <div id="satisItemFormset">
+                                                <h4>Turu Özelleştir</h4>
+                                                {{ formset.management_form }}
+                                                {% for form in formset %}
+                                                    <div class="row mb-2">
+                                                        {{form.id}}
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.gun.label }}</div>
+                                                            <div>{{ form.gun }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.saat.label }}</div>
+                                                            <div>{{ form.saat }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.islem_turu.label }}</div>
+                                                            <div>{{ form.islem_turu }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.aciklama.label }}</div>
+                                                            <div>{{ form.aciklama }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.oteller.label }}</div>
+                                                            <div>{{ form.oteller }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.otel_turu.label }}</div>
+                                                            <div>{{ form.otel_turu }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.turlar.label }}</div>
+                                                            <div>{{ form.turlar }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.transferler.label }}</div>
+                                                            <div>{{ form.transferler }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.arac_tipi.label }}</div>
+                                                            <div>{{ form.arac_tipi }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.rehber.label }}</div>
+                                                            <div>{{ form.rehber }}</div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div>{{ form.fiyat.label }}</div>
+                                                            <div>{{ form.fiyat }}</div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+
+                                            </div>
+                                            <button class="btn btn-primary" type="submit">Kaydet</button>
+                                        </form>
+                                        <!-- ... -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--end card-body-->
+                        <div class="card-body bg-light-alt text-center">
+                            <span class="text-muted d-none d-sm-inline-block">Carga Business © 2023</span>                                            
+                        </div>
+                    </div><!--end card-->
+                </div><!--end col-->
+            </div><!--end row-->
+        </div><!--end col-->
+    </div><!--end row-->
+</div><!--end container-->
+<!-- End Add Vehicle page -->
+
+{% endblock content %}
+
+{% block js %}
+    <!-- jQuery  -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/waves.js' %}"></script>
+    <script src="{% static 'assets/js/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/simplebar.min.js' %}"></script>
+    
+{% endblock js %}
