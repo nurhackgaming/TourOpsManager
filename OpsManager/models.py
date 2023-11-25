@@ -207,6 +207,7 @@ class Satis(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Toplam Fiyat")
     satildi = models.BooleanField(verbose_name="Satıldı mı?", default=False)
     def save(self, *args, **kwargs): 
+        super().save(*args, **kwargs)
         self.calculate_total_price()
         super().save(*args, **kwargs)  # Toplam fiyatı güncelleyerek tekrar kaydet
 
@@ -261,12 +262,10 @@ class SatisItem(models.Model):
     fiyat = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Fiyat")
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs) 
         self.calculate_price()  # Fiyatı hesapla
-
         super().save(*args, **kwargs)  # SatisItem nesnesini kaydet
 
-        if self.satis:
+        if self.satis_id:  # Satis modelinin kaydedilmiş olduğundan emin ol
             self.satis.calculate_total_price()  # İlişkili Satis nesnesinin total_price'ını hesapla
             self.satis.save()  # İlişkili Satis nesnesini güncelle
 
