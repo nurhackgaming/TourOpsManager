@@ -197,11 +197,12 @@ class Transfer(models.Model):
 
 class Satis(models.Model):
     sirket = models.ForeignKey(Sirket, verbose_name="Şirket", on_delete=models.CASCADE)
-    satici_personel = models.ForeignKey(Personel, on_delete=models.CASCADE, verbose_name="Satıcı Personel")
+    satici_personel = models.ForeignKey(Personel, on_delete=models.CASCADE, verbose_name="Satıcı Personel", related_name='satislar_satici')
+    takip_personel = models.ForeignKey(Personel, on_delete=models.CASCADE, verbose_name="Takip Eden Personel", related_name='satislar_takipci', blank=True, null=True)    
     alici_musteri = models.ForeignKey(Musteri, on_delete=models.CASCADE, verbose_name="Alıcı Müşteri")
     sabit_giderler = models.ManyToManyField(SabitGider, blank=True, verbose_name="Sabit Giderler")
     yolcu = models.ForeignKey(YolcuBilgileri, on_delete=models.CASCADE, verbose_name="Yolcu Bilgisi", blank=True, null=True)
-    digeryolcular = models.ManyToManyField(DigerYolcuBilgileri, verbose_name="Diğer Yolcu Bilgileri", blank=True, null=True)
+    digeryolcular = models.ManyToManyField(DigerYolcuBilgileri, verbose_name="Diğer Yolcu Bilgileri")
     baslangic_tarihi = models.DateTimeField(verbose_name="Başlangıç Tarihi", blank=True, null=True)
     bitis_tarihi = models.DateTimeField(verbose_name="Bitiş Tarihi", blank=True, null=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Toplam Fiyat")
@@ -220,11 +221,6 @@ class Satis(models.Model):
             total += gider.fiyati
             
         self.total_price = total
-
-        
-        
-
-
     def __str__(self):
         return f"{self.satici_personel} - {self.alici_musteri}"
 
@@ -249,7 +245,7 @@ class SatisItem(models.Model):
     ]
     sirket = models.ForeignKey(Sirket, verbose_name="Şirket", on_delete=models.CASCADE)
     satis = models.ForeignKey(Satis, on_delete=models.CASCADE, verbose_name="Satış")
-    gun = models.CharField(max_length=3, verbose_name="Gün", blank=True, null=True)
+    gun = models.DateTimeField(verbose_name="Tarih", blank=True, null=True)
     saat = models.TimeField(null=True, blank=True, verbose_name="Saat")
     islem_turu = models.CharField(max_length=50, choices=ISLEM_TURLERI, verbose_name="İşlem Türü")
     aciklama = models.CharField(max_length=250, blank=True, null=True, verbose_name="Açıklama")
@@ -270,42 +266,53 @@ class SatisItem(models.Model):
             self.satis.save()  # İlişkili Satis nesnesini güncelle
 
     def calculate_price(self):
+        print("Fiyat hesaplama fonksiyonuna girdi.")
         self.fiyat = 0  # Başlangıçta fiyatı sıfırla
 
         # Otel fiyatını ekle
         if self.oteller:
             if self.otel_turu == 'Tek':
                 self.fiyat += self.oteller.tek_kisilik_oda_ucreti
+                print("Tek kişilik oda ücreti eklendi:", self.oteller.tek_kisilik_oda_ucreti)
             elif self.otel_turu == 'Çift':
                 self.fiyat += self.oteller.cift_kisilik_oda_ucreti
+                print("Çift kişilik oda ücreti eklendi:", self.oteller.cift_kisilik_oda_ucreti)
 
         # Tur fiyatını ekle
         if self.turlar:
             self.fiyat += self.turlar.fiyati
+            print("Tur fiyatı eklendi:", self.turlar.fiyati)
 
         # Rehber ücretini ekle
         if self.rehber:
             self.fiyat += self.rehber.ucreti
+            print("Rehber ücreti eklendi:", self.rehber.ucreti)
 
         # Transfer fiyatını ekle
         if self.transferler and self.arac_tipi:
             # Arac tipine göre transfer fiyatını hesapla
             if self.arac_tipi.kapasite == 5:
                 self.fiyat += self.transferler.fiyat_5_koltuk
+                print("5 koltuklu araç transfer ücreti eklendi:", self.transferler.fiyat_5_koltuk)
             elif self.arac_tipi.kapasite == 7:
                 self.fiyat += self.transferler.fiyat_7_koltuk
+                print("7 koltuklu araç transfer ücreti eklendi:", self.transferler.fiyat_7_koltuk)
             elif self.arac_tipi.kapasite == 9:
                 self.fiyat += self.transferler.fiyat_9_koltuk
+                print("9 koltuklu araç transfer ücreti eklendi:", self.transferler.fiyat_9_koltuk)
             elif self.arac_tipi.kapasite == 12:
                 self.fiyat += self.transferler.fiyat_12_koltuk
+                print("12 koltuklu araç transfer ücreti eklendi:", self.transferler.fiyat_12_koltuk)
             elif self.arac_tipi.kapasite == 15:
                 self.fiyat += self.transferler.fiyat_15_koltuk
+                print("15 koltuklu araç transfer ücreti eklendi:", self.transferler.fiyat_15_koltuk)
             elif self.arac_tipi.kapasite == 20:
                 self.fiyat += self.transferler.fiyat_16_20_koltuk
-            # ... [diğer araç kapasiteleri için benzer ifadeler] ...
+                print("16-20 koltuklu araç transfer ücreti eklendi:", self.transferler.fiyat_16_20_koltuk)
+            # Diğer araç tiplerini buraya ekleyebilirsiniz.
             else:
                 print("Uygun araç tipi fiyatı bulunamadı.")
-                
+
         if self.satis.alici_musteri and self.satis.alici_musteri.musteri_tipi:
             # Müşteri tipine göre çarpan
             multiplier_dict = {
@@ -317,6 +324,9 @@ class SatisItem(models.Model):
             }
             multiplier = multiplier_dict.get(self.satis.alici_musteri.musteri_tipi, Decimal('1'))
             self.fiyat = self.fiyat * multiplier
+            print("Müşteri tipine göre çarpan uygulandı. Çarpan:", multiplier)
+
+        print("Fiyat hesaplama fonksiyonu tamamlandı. Toplam fiyat:", self.fiyat)
 
     def __str__(self):
         return f"{self.satis} - {self.islem_turu}"
@@ -335,6 +345,9 @@ class Fiyatlandırma(models.Model):
     yemek_toplam = models.DecimalField(verbose_name="Yemek Toplam Fiyatı", max_digits=10, decimal_places=2, blank=True, null=True)
     double_oda_toplam = models.DecimalField(verbose_name="Double Oda Toplam Fiyatı", max_digits=10, decimal_places=2, blank=True, null=True)
     single_oda_toplam = models.DecimalField(verbose_name="Single Oda Toplam Fiyatı", max_digits=10, decimal_places=2, blank=True, null=True)
+    onay = models.BooleanField(verbose_name="Onay", default=False)
+    islem = models.BooleanField(verbose_name="İslem", default=False)
+    aciklama = models.TextField(verbose_name="Açıklama", default="Beklemede")
     def __str__(self):
         return f"{self.olusturan.user.get_full_name()} - {self.genel_toplam}"
 

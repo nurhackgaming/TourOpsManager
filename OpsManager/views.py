@@ -1,5 +1,6 @@
-import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth import authenticate, login, logout
+from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -36,9 +37,58 @@ def logout_view(request):
 
 @login_required
 def index(request):
-    return render(request, 'index.html', {'title' : 'Anasayfa'})
+    user = request.user
+    bugun = datetime.today().date()
+    yarin = bugun + timedelta(days=1)  # Yarının tarihini hesapla
 
+    bugunku_turlar = Satis.objects.filter(sirket = user.personel.sirket, baslangic_tarihi__date=bugun)
+    yarinki_turlar = Satis.objects.filter(sirket=user.personel.sirket, baslangic_tarihi__date=yarin)
 
+    fiyatlandirmalar = Fiyatlandırma.objects.filter(sirket = user.personel.sirket)  # Tüm personelleri alın
+    etkinlikler = []
+    yarin_etkinlikler = []
+    for tur in bugunku_turlar:
+        turun_etkinlikleri = SatisItem.objects.filter(sirket = user.personel.sirket, satis=tur, gun__date=bugun)
+        for etkinlik in turun_etkinlikleri:
+            etkinlikler.append(etkinlik)
+    for tur in yarinki_turlar:
+        turun_etkinlikleri = SatisItem.objects.filter(sirket = user.personel.sirket, satis=tur, gun__date=yarin)
+        for etkinlik in turun_etkinlikleri:
+            yarin_etkinlikler.append(etkinlik)
+
+    context = {
+        'bugunku_turlar': bugunku_turlar,
+        'etkinlikler': etkinlikler,
+        'title' : 'Anasayfa',
+        'fiyatlandirmalar' : fiyatlandirmalar,
+        'yarinki_turlar' : yarinki_turlar,
+        'yarin_etkinlikler' : yarin_etkinlikler,
+    }
+    return render(request, 'index.html', context)
+
+@login_required
+def fiyatlandirma_islem(request, fiyat_id):
+    user = request.user
+    fiyat = get_object_or_404(Fiyatlandırma, sirket=user.personel.sirket, id=fiyat_id)
+    if request.method == 'POST':
+        onay = request.POST['onay']
+        aciklama = request.POST['aciklama']
+        if onay == "True":
+            fiyat.islem=True
+            fiyat.onay = True
+            fiyat.aciklama = "Tebrikler Fiyat Onaylandı."
+            fiyat.save()
+        elif onay == "False":
+            fiyat.islem=True
+            if aciklama:
+                fiyat.aciklama = aciklama
+                fiyat.onay = False
+                fiyat.save()
+            else:
+                fiyat.aciklama = "Fiyat uygun değil."
+                fiyat.onay = False
+                fiyat.save()
+        return redirect('index')
 @login_required
 def add_personel(request):
     if request.method == 'POST':
@@ -463,22 +513,17 @@ def edit_satis(request, satis_id):
 
 @login_required
 def create_satis(request):
-
     if request.method == 'POST':
         form = SatisForm(request.POST, request=request)
         if form.is_valid():
             satis = form.save()
             formset = SatisItemFormSet(request.POST, instance=satis)
 
-            # Formset içindeki her form için request parametresini ayarla
-            for form in formset:
-                form.request = request
-
             if formset.is_valid():
                 formset.save()
                 return redirect('index')
     else:
-        form = SatisForm()
+        form = SatisForm(request=request)
         formset = SatisItemFormSet()
 
     return render(request, 'satis_ekle.html', {'form': form, 'formset': formset, 'title': 'Satış Yap'})
@@ -545,87 +590,8 @@ def delete_yolcu_bilgileri(request, yolcu_bilgileri_id):
 from django.http import HttpResponse
 from io import BytesIO # Modelinizi burada import edin
 
-# def export_to_word(request, satis_id):
-#     # Veritabanından satış ve ilgili verileri alın
-#     satis = get_object_or_404(Satis, pk=satis_id)
-#     satis_items = satis.satisitem_set.all()
-#     yolcu_sayisi = 0
-#     if not satis.yolcu == None:
-#         yolcu_sayisi += 1
-#     if not satis.digeryolcular.count() == 0:
-#         yolcu_sayisi += satis.digeryolcular.count()
-#     # Word dokümanı oluştur
-#     doc = Document()
-#     doc.add_heading('Satış Raporu', 0)
-
-#     # Ana tabloyu ekle
-#     table = doc.add_table(rows=1, cols=8)
-#     hdr_cells = table.rows[0].cells
-#     hdr_cells[0].text = 'ID'
-#     hdr_cells[1].text = 'Satıcı Personel'
-#     hdr_cells[2].text = 'Alıcı Müşteri'
-#     hdr_cells[3].text = 'Başlangıç Tarihi'
-#     hdr_cells[4].text = 'Bitiş Tarihi'
-#     hdr_cells[5].text = 'Satış Durumu'
-#     hdr_cells[6].text = 'Toplam Fiyat'
-#     hdr_cells[7].text = 'Toplam Yolcu Sayısı'
-#     # ... diğer başlık hücrelerini doldurun
-
-#     # Satış verilerini tabloya ekle
-#     row_cells = table.add_row().cells
-#     row_cells[0].text = str(satis.id) if satis.id else "-----"
-#     row_cells[1].text = satis.satici_personel.user.get_full_name() if satis.satici_personel.user else "-----"
-#     row_cells[2].text = f"{satis.alici_musteri.ad} {satis.alici_musteri.soyad}" if satis.alici_musteri.ad else "-----"
-#     row_cells[3].text = str(satis.baslangic_tarihi) if satis.baslangic_tarihi else "-----"
-#     row_cells[4].text = str(satis.bitis_tarihi) if satis.bitis_tarihi else "-----"
-#     row_cells[5].text = "Satıldı" if satis.satildi else "Beklemede" if satis.satildi else "-----"
-#     row_cells[6].text = str(satis.total_price) if satis.total_price else "-----"
-#     row_cells[7].text = str(yolcu_sayisi) if yolcu_sayisi else "-----"
-#     # Yolcu sayısını nasıl hesapladığınıza bağlı
-#     # ... diğer satış verilerini doldurun
-
-#     # Satış öğeleri için alt tablo oluştur
-#     doc.add_paragraph('Satış Detayları:')
-#     for item in satis_items:
-#         item_table = doc.add_table(rows=1, cols=10)
-#         item_hdr_cells = item_table.rows[0].cells
-#         item_hdr_cells[0].text = 'Gün'
-#         item_hdr_cells[1].text = 'İşlem Türü'
-#         item_hdr_cells[2].text = 'Açıklama'
-#         item_hdr_cells[3].text = 'Otel'
-#         item_hdr_cells[4].text = 'Otel Türü'
-#         item_hdr_cells[5].text = 'Tur'
-#         item_hdr_cells[6].text = 'Transfer'
-#         item_hdr_cells[7].text = 'Araç Tipi'
-#         item_hdr_cells[8].text = 'Rehber'
-#         item_hdr_cells[9].text = 'Fiyat'
-#         # ... diğer başlık hücrelerini doldurun
-
-#         item_row_cells = item_table.add_row().cells
-#         item_row_cells[0].text = str(item.gun) if item.gun else "-----"
-#         item_row_cells[1].text = item.islem_turu if item.islem_turu else "-----"
-#         item_row_cells[2].text = item.aciklama if item.aciklama else "-----"
-#         item_row_cells[3].text = item.oteller if item.oteller else "-----"
-#         item_row_cells[4].text = item.otel_turu if item.otel_turu else "-----"
-#         item_row_cells[5].text = item.turlar.adi if item.turlar else "-----"
-#         item_row_cells[6].text = item.transferler.guzergah if item.transferler else "-----"
-#         item_row_cells[7].text = item.arac_tipi.adi if item.arac_tipi else "-----"
-#         item_row_cells[8].text = item.rehber.adi if item.rehber else "-----"
-#         item_row_cells[9].text = str(item.fiyat) if item.fiyat else "-----"
-#         # ... diğer satış öğesi verilerini doldurun
-
-#     # Word dokümanını bir byte stream olarak kaydet
-#     file_stream = BytesIO()
-#     doc.save(file_stream)
-#     file_stream.seek(0)
-
-#     # Kullanıcıya indirme olarak sun
-#     response = HttpResponse(file_stream.read(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-#     response['Content-Disposition'] = 'attachment; filename=satis_raporu.docx'
-#     return response
 
 import pandas as pd
-import pytz
 from django.http import HttpResponse
 from .models import Satis  # Modelinizi burada import edin
 from io import BytesIO
@@ -722,10 +688,6 @@ def create_fiyatlandirma(request):
 
             # İşlem başarılıysa, başka bir sayfaya yönlendir
             return redirect('index')
-        else:
-            print("Form veya FormSet geçerli değil")
-            print("Form Hataları:", form.errors)
-            print("FormSet Hataları:", formset.errors)
     else:
         form = FiyatlandirmaForm(request=request)
         formset = FiyatlandirmaItemFormSet()
@@ -744,3 +706,39 @@ def fiyatlandirma_detay(request, fiyatlandirma_id):
     # Satışları alın ve ilgili satış itemlerini "prefetch_related" ile alın
     fiyatlandirma = Fiyatlandırma.objects.prefetch_related('fiyatlandirmaitem_set').get(id = fiyatlandirma_id)  # Satis modelini kendi projenizdeki modele uygun bir şekilde kullanın
     return render(request, 'fiyatlandirma_detay.html', {'fiyatlandirma': fiyatlandirma, 'title': 'Fiyatlandırma Detay'})
+
+@login_required
+def edit_fiyatlandirma(request, fiyatlandirma_id):
+    fiyatlandirma = get_object_or_404(Fiyatlandırma, id=fiyatlandirma_id)
+
+    if request.method == 'POST':
+        form = FiyatlandirmaForm(request.POST, instance=fiyatlandirma, request=request)
+        formset = FiyatlandirmaItemFormSet(request.POST, instance=fiyatlandirma)
+
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            messages.success(request, "Fiyatlandırma başarıyla güncellendi.")
+            return redirect('fiyatlandirma_detay', fiyatlandirma_id=fiyatlandirma_id)
+        else:
+            # Hata ayıklama için bu kısımları ekleyin
+            if not form.is_valid():
+                print("Form Hataları:", form.errors)
+
+            if not formset.is_valid():
+                for form in formset:
+                    if not form.is_valid():
+                        print("FormSet Hatası:", form.errors)
+            # Hata mesajlarını kullanıcıya göster
+            messages.error(request, "Form veya FormSet'te hatalar var.")
+    else:
+        form = FiyatlandirmaForm(instance=fiyatlandirma, request=request)
+        formset = FiyatlandirmaItemFormSet(instance=fiyatlandirma)
+
+    context = {
+        'form': form,
+        'formset': formset,
+        'title': 'Fiyatlandırmayı Düzenle'
+    }
+    return render(request, 'fiyatlandirma.html', context)
+

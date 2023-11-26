@@ -17,6 +17,7 @@
             <tr>
                 <th>ID</th>
                 <th>Satıcı Personel</th>
+                <th>Takip Personel</th>
                 <th>Alıcı Müşteri</th>
                 <th>Başlangıç Tarihi</th>
                 <th>Bitiş Tarihi</th>
@@ -30,6 +31,7 @@
                 <tr>
                     <td><a href="{% url 'satis_detay' satis.id %}">{{ satis.id }}</a></td>
                     <td>{{ satis.satici_personel.user.get_full_name }}</td>
+                    <td>{{ satis.takip_personel.user.get_full_name }}</td>
                     <td>{{ satis.alici_musteri.ad }} {{ satis.alici_musteri.soyad }}</td>
                     <td>{{ satis.baslangic_tarihi }}</td>
                     <td>{{ satis.bitis_tarihi }}</td>

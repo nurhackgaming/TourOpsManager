@@ -336,9 +336,10 @@ class MusteriForm(SetCompanyMixin, WidgetMixin, forms.ModelForm):
 class SatisForm(SetCompanyMixin, WidgetMixin, forms.ModelForm):
     class Meta:
         model = Satis
-        fields = ['satici_personel', 'alici_musteri', 'sabit_giderler', 'yolcu', 'digeryolcular', 'baslangic_tarihi', 'bitis_tarihi', 'satildi']
+        fields = ['satici_personel', 'takip_personel', 'alici_musteri', 'sabit_giderler', 'yolcu', 'digeryolcular', 'baslangic_tarihi', 'bitis_tarihi', 'satildi']
         labels = {
             'satici_personel': 'Satıcı Personel',
+            'takip_personel': 'Takip eden Personel',
             'alici_musteri': 'Alıcı Müşteri',
             'sabit_giderler': 'Sabit Giderler',
             'yolcu': 'Yolcu Bilgisi',
@@ -349,6 +350,7 @@ class SatisForm(SetCompanyMixin, WidgetMixin, forms.ModelForm):
         }
         widgets = {
             'satici_personel': forms.Select(attrs={'class': 'form-control'}),
+            'takip_personel': forms.Select(attrs={'class': 'form-control'}),
             'alici_musteri': forms.Select(attrs={'class': 'form-control'}),
             'sabit_giderler': forms.CheckboxSelectMultiple(attrs={'class': 'form-control'}),
             'yolcu': forms.Select(attrs={'class': 'form-control'}),
@@ -362,10 +364,18 @@ class SatisForm(SetCompanyMixin, WidgetMixin, forms.ModelForm):
         self.request = kwargs.pop('request', None)
         super(SatisForm, self).__init__(*args, **kwargs)
         self.set_widgets()
+        self.fields['satici_personel'].queryset = Personel.objects.none()
+
+        if self.request:
+            self.fields['satici_personel'].queryset = Personel.objects.filter(user=self.request.user)
+            if not self.instance.pk:  # Yeni bir kayıt oluşturuluyorsa
+                self.initial['satici_personel'] = Personel.objects.get(user=self.request.user)
         
     def save(self, commit=True):
         satis = super(SatisForm, self).save(commit=False)
         self.set_company_from_request(satis)
+        if not satis.satici_personel:
+            satis.satici_personel = Personel.objects.get(user=self.request.user)
         if commit:
             satis.save()
             self.save_m2m()
@@ -376,10 +386,9 @@ class SatisForm(SetCompanyMixin, WidgetMixin, forms.ModelForm):
 class SatisItemForm(SetCompanyMixin, WidgetMixin, forms.ModelForm):
     class Meta:
         model = SatisItem
-        fields = ['gun', 'saat', 'islem_turu', 'aciklama', 'oteller', 'otel_turu', 'turlar', 'transferler', 'arac_tipi', 'rehber', 'fiyat']
+        fields = ['gun', 'islem_turu', 'aciklama', 'oteller', 'otel_turu', 'turlar', 'transferler', 'arac_tipi', 'rehber', 'fiyat']
         labels = {
-            'gun': 'Gün',
-            'saat': 'Saat',
+            'gun': 'Tarih',
             'islem_turu': 'İşlem Türü',
             'aciklama': 'Açıklama',
             'oteller': 'Otel',
@@ -391,8 +400,8 @@ class SatisItemForm(SetCompanyMixin, WidgetMixin, forms.ModelForm):
             'fiyat': 'Fiyat',
         }
         widgets = {
-            'gun': forms.TextInput(attrs={'class': 'form-control'}),
-            'saat': forms.TimeInput(attrs={'class': 'form-control'}),
+            'gun': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+
             'islem_turu': forms.Select(attrs={'class': 'form-control'}),
             'aciklama': forms.TextInput(attrs={'class': 'form-control'}),
             'oteller': forms.Select(attrs={'class': 'form-control'}),

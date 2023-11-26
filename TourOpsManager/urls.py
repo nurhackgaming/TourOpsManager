@@ -17,7 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from OpsManager import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.login_view, name='login'),
@@ -85,10 +86,15 @@ urlpatterns = [
     path('satis-list/', views.satis_list, name='satis_list'),
     path('satis/detay/<int:satis_id>', views.satis_detay, name='satis_detay'),
     path('satis/duzenle/<int:satis_id>/', views.edit_satis, name='edit_satis'),
-
-
     path('satis-raporu-indir/<int:satis_id>/', views.export_to_excel, name='satis_raporu_indir'),
+
+
     path('fiyatlandirma/', views.create_fiyatlandirma, name='create_fiyatlandirma'),
+    path('fiyatlandirma/<int:fiyat_id>', views.fiyatlandirma_islem, name='fiyatlandirma_islem'),
     path('fiyatlandirma-list/', views.fiyatlandırma_list, name='fiyatlandırma_list'),
     path('fiyatlandirma/detay/<int:fiyatlandirma_id>', views.fiyatlandirma_detay, name='fiyatlandirma_detay'),
+    path('fiyatlandirma/edit/<int:fiyatlandirma_id>/', views.edit_fiyatlandirma, name='edit_fiyatlandirma'),
+
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

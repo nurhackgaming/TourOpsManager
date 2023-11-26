@@ -60,6 +60,7 @@
             <tr>
                 <th>Sipariş No</th>
                 <th>Satıcı Personel</th>
+                <th>Takip Personel</th>
                 <th>Alıcı Müşteri</th>
                 <th>Başlangıç Tarihi</th>
                 <th>Bitiş Tarihi</th>
@@ -73,6 +74,7 @@
                 <tr>
                     <td>{{ satis.id }}</td>
                     <td>{{ satis.satici_personel.user.get_full_name }}</td>
+                    <td>{{ satis.takip_personel.user.get_full_name }}</td>
                     <td>{{ satis.alici_musteri.ad }} {{ satis.alici_musteri.soyad }}</td>
                     <td>{{ satis.baslangic_tarihi }}</td>
                     <td>{{ satis.bitis_tarihi }}</td>
@@ -81,13 +83,12 @@
                     <!-- Diğer sütunlar burada eklenebilir -->
                 </tr>
                 <!-- Satis itemlerini içeren bir alt tablo oluşturun -->
-                <tr>
-                    <td colspan="7">
+                <tr class="mt-2">
+                    <td colspan="8">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>Gün</th>
-                                    <th>Saat</th>
                                     <th>İşlem Türü</th>
                                     <th>Açıklama</th>
                                     <th>Otel</th>
@@ -105,11 +106,6 @@
                                     <tr>
                                         {% if satis_item.gun != None %}
                                             <td>{{ satis_item.gun }}</td>
-                                        {% else %}
-                                            <td>----</td>
-                                        {% endif %}
-                                        {% if satis_item.saat != None %}
-                                            <td>{{ satis_item.saat }}</td>
                                         {% else %}
                                             <td>----</td>
                                         {% endif %}

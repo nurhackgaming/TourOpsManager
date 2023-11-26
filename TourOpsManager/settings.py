@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-(vaqzo=p$@inz8-1m82v)%#9ns+++emf#k*ts(h5k44-mci84z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -121,7 +121,13 @@ DATE_INPUT_FORMATS = ['%d.%m.%Y']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# Statik dosyalar (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'  # Projedeki statik dosyaların toplanacağı yer
+
+# Medya dosyaları için
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'  # Kullanıcı yüklemelerinin saklanacağı yer
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
