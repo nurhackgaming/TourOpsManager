@@ -587,79 +587,8 @@ def delete_yolcu_bilgileri(request, yolcu_bilgileri_id):
 
 
 
-from django.http import HttpResponse
-from io import BytesIO # Modelinizi burada import edin
 
 
-import pandas as pd
-from django.http import HttpResponse
-from .models import Satis  # Modelinizi burada import edin
-from io import BytesIO
-
-def export_to_excel(request, satis_id):
-    # Veritabanından satış ve ilgili verileri alın
-    satis = get_object_or_404(Satis, pk=satis_id)
-    satis_items = satis.satisitem_set.all()
-
-    # Zaman dilimi bilgisini kaldırın
-    from datetime import datetime, timezone
-
-    def remove_timezone(dt):
-        if isinstance(dt, datetime):
-            return dt.astimezone(timezone.utc).replace(tzinfo=None)
-        return dt  # Eğer datetime değilse, aynı değeri geri döndür
-
-    # Satış bilgilerini bir DataFrame'e aktarın
-    satis_data = {
-        'ID': [satis.id],
-        'Satıcı Personel': [satis.satici_personel.user.get_full_name()],
-        'Alıcı Müşteri': [f"{satis.alici_musteri.ad} {satis.alici_musteri.soyad}"],
-        'Başlangıç Tarihi': [remove_timezone(satis.baslangic_tarihi)],
-        'Bitiş Tarihi': [remove_timezone(satis.bitis_tarihi)],
-        'Satış Durumu': ['Satıldı' if satis.satildi else 'Beklemede'],
-        'Toplam Fiyat': [satis.total_price]
-        # Diğer satış bilgileri eklenebilir
-    }
-    df_satis = pd.DataFrame(satis_data)
-
-    # Satış öğelerini bir DataFrame'e aktarın
-    satis_items_data = [{
-        'gun': remove_timezone(item.gun),
-        'islem_turu': item.islem_turu,
-        'aciklama': item.aciklama,
-        'oteller': item.oteller,
-        'otel_turu': item.otel_turu,
-        'turlar': item.turlar,
-        'transferler': item.transferler,
-        'arac_tipi': item.arac_tipi,
-        'rehber': item.rehber,
-        'fiyat': item.fiyat
-        # Diğer satış öğe bilgileri eklenebilir
-    } for item in satis_items]
-    df_satis_items = pd.DataFrame(satis_items_data)
-
-    # Excel dosyasını bir byte stream olarak oluşturun
-    with BytesIO() as b:
-        # Excel writer oluşturun
-        with pd.ExcelWriter(b, engine='openpyxl') as writer:
-            # İlk DataFrame'i yazdırın
-            df_satis.to_excel(writer, sheet_name='Satış Raporu', index=False)
-            
-            # İkinci DataFrame'in başlangıç satırını hesaplayın
-            startrow = len(df_satis) + 2  # İlk DataFrame'in uzunluğu + boşluk
-
-            # İkinci DataFrame'i yazdırın
-            df_satis_items.to_excel(writer, sheet_name='Satış Raporu', startrow=startrow, index=False)
-
-        # Kullanıcıya indirme olarak sunun
-        response = HttpResponse(
-            b.getvalue(),
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        response['Content-Disposition'] = 'attachment; filename=satis_raporu.xlsx'
-        return response
-
-from datetime import datetime
 
 def parse_custom_date(date):
     # Veritabanından gelen datetime.date nesnesini doğrudan kullanın

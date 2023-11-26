@@ -86,7 +86,6 @@ urlpatterns = [
     path('satis-list/', views.satis_list, name='satis_list'),
     path('satis/detay/<int:satis_id>', views.satis_detay, name='satis_detay'),
     path('satis/duzenle/<int:satis_id>/', views.edit_satis, name='edit_satis'),
-    path('satis-raporu-indir/<int:satis_id>/', views.export_to_excel, name='satis_raporu_indir'),
 
 
     path('fiyatlandirma/', views.create_fiyatlandirma, name='create_fiyatlandirma'),
